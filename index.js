@@ -1,4 +1,7 @@
-const http = require('http');
+const http = require('http'); 
+const httpProxy = require('http-proxy');
+const url = require('url');
+const fs = require('fs');
 
 // Common handler for all servers
 function requestHandler(port) {
@@ -31,10 +34,7 @@ server5000.listen(5000, () => {
 
 
 
-const http = require('http'); 
-const httpProxy = require('http-proxy');
-const url = require('url');
-const fs = require('fs');
+
 
 // Define your port mappings
 const portMappings = {
