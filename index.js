@@ -125,7 +125,7 @@ const server = http.createServer((req, res) => {
 });
 
 // Define the proxy server's listening port
-const PROXY_PORT = 6000;
+const PROXY_PORT = 4004;
 server.listen(PROXY_PORT, '0.0.0.0', () => {
     console.log(`Proxy server running on port ${PROXY_PORT}`);
     console.log(`Access URLs:`);
