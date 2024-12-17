@@ -1,6 +1,6 @@
 const http = require('http'); 
-const httpProxy = require('http-proxy');
-const url = require('url');
+const httpProxy = require('http-proxy'); 
+const url = require('url'); 
 const fs = require('fs');
 
 // Common handler for all servers
@@ -30,11 +30,6 @@ const server5000 = http.createServer(requestHandler(5000));
 server5000.listen(5000, () => {
     console.log('Test server running on port 5000');
 });
-
-
-
-
-
 
 // Define your port mappings
 const portMappings = {
@@ -117,10 +112,10 @@ const server = http.createServer((req, res) => {
         proxy.web(req, res, { target: activeTarget });
         logRequest(req, 200, `Proxying to active target: ${activeTarget}`);
     } else {
-        // No valid port found, return 404
+        // No valid port found, return 404 and log the attempt
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'No valid port found and no active proxy target set.' }));
-        logRequest(req, 404, 'No valid port found and no active proxy target set.');
+        logRequest(req, 404, 'Undefined port accessed');
     }
 });
 
