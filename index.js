@@ -30,6 +30,18 @@ const server5000 = http.createServer(requestHandler(5000));
 server5000.listen(5000, () => {
     console.log('Test server running on port 5000');
 });
+//---------------------------------------------------------------
+
+// const http = require('http');
+// const httpProxy = require('http-proxy');
+// const url = require('url');
+// const fs = require('fs');
+
+// Ensure requests.log exists or create it
+const logFilePath = 'requests.log';
+if (!fs.existsSync(logFilePath)) {
+    fs.writeFileSync(logFilePath, '');
+}
 
 // Define your port mappings
 const portMappings = {
@@ -82,7 +94,7 @@ const server = http.createServer((req, res) => {
     // Check if the request is for the logging endpoint
     if (parsedUrl.pathname === '/logs') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        const logFile = fs.readFileSync('requests.log', 'utf8');
+        const logFile = fs.readFileSync(logFilePath, 'utf8');
         const logs = logFile.split('\n').filter(Boolean).map(line => JSON.parse(line));
         res.end(JSON.stringify(logs));
         return;
@@ -104,6 +116,11 @@ const server = http.createServer((req, res) => {
         // Proxy the request to the new target
         proxy.web(req, res, { target: portMappings[potentialPort] });
         logRequest(req, 200, `Proxying to ${portMappings[potentialPort]}`);
+    } else if (potentialPort && !portMappings[potentialPort]) {
+        // Log and return 404 for undefined ports
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: `Port ${potentialPort} not found` }));
+        logRequest(req, 404, `Port ${potentialPort} not found`);
     } else if (activeTargets.has(clientIp)) {
         // Continue to proxy subsequent requests to the active target
         const activeTarget = activeTargets.get(clientIp);
@@ -112,15 +129,15 @@ const server = http.createServer((req, res) => {
         proxy.web(req, res, { target: activeTarget });
         logRequest(req, 200, `Proxying to active target: ${activeTarget}`);
     } else {
-        // No valid port found, return 404 and log the attempt
+        // No valid port found, return 404
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'No valid port found and no active proxy target set.' }));
-        logRequest(req, 404, 'Undefined port accessed');
+        logRequest(req, 404, 'No valid port found and no active proxy target set.');
     }
 });
 
 // Define the proxy server's listening port
-const PROXY_PORT = 4004;
+const PROXY_PORT = 6000;
 server.listen(PROXY_PORT, '0.0.0.0', () => {
     console.log(`Proxy server running on port ${PROXY_PORT}`);
     console.log(`Access URLs:`);
